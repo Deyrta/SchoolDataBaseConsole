@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace SchoolDataBaseConsole
 {
@@ -24,40 +25,55 @@ namespace SchoolDataBaseConsole
         public void DBInterface()
         {
             int choise;
+            int localChoise;
             while(true)
             {
-                Console.WriteLine("Pick action(1 - Show Data; 2 - Search Data; 3 - Select Data; 4 - Delete Data; 5 - Enter Data; Anything else to exit:");
+                Console.WriteLine("Pick action(1 - Search Data; 2 - OutPut Data; 3 - Delete Data; 4 - Enter Data; Anything else to exit:");
                 choise = int.Parse(Console.ReadLine());
+
                 switch(choise)
                 {
                     case 1:
-                        Console.WriteLine("Enter which table you want to see(1/2/3):");
-                        programmeInterface.ShowData(int.Parse(Console.ReadLine()));
+                        Console.WriteLine("Write table number where you want to find a word:");
+                        localChoise = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Write a word to search:");
+                        programmeInterface.SearchData(Console.ReadLine(),localChoise);
                         break;
                     case 2:
-                        Console.WriteLine("Write a word to search:");
-                        programmeInterface.SearchData(Console.ReadLine());
-                        break;
-                    case 3:
-                        Console.WriteLine("How many tables you want to see(2/3)?");
-                        int localChoise = int.Parse(Console.ReadLine());
-                        if(localChoise != 2 || localChoise != 3)
+                        Console.WriteLine("How many tables you want to see(1,2,3)?");
+                        localChoise = int.Parse(Console.ReadLine());
+                        if(localChoise != 2 && localChoise != 3 && localChoise != 1)
                         {
                             Console.WriteLine("You picked wrong number.");
                             continue;
-                        }    
-                        programmeInterface.SelectData(localChoise);
+                        }
+                        else 
+                            programmeInterface.OutputData(localChoise);
                         break;
-                    case 4:
+                    case 3:
                         Console.WriteLine("Pick table where you want to delete a label.");
                         localChoise = int.Parse(Console.ReadLine());
                         Console.WriteLine("Pick a word from label:");
                         programmeInterface.DeleteData(Console.ReadLine(),localChoise);
                         break;
-                    case 5:
+                    case 4:
                         Console.WriteLine("Pick a table where you want to enter a data");
                         programmeInterface.EnterData(int.Parse(Console.ReadLine()));
                         break;
+                    case 5:
+                        Console.WriteLine("Pick how many tables(Use keys 1,2,3:");
+                        localChoise = int.Parse(Console.ReadLine());
+                        if (localChoise != 2 && localChoise != 3 && localChoise != 1)
+                        {
+                            Console.WriteLine("You picked wrong number.");
+                            continue;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Pick a word:");
+                            programmeInterface.SelectData(localChoise, Console.ReadLine());
+                        }
+                            break;
                     default:
                         choise = -1;
                         Console.WriteLine("Exiting program...");
@@ -88,7 +104,7 @@ namespace SchoolDataBaseConsole
                         dataWriter.WriteLine("Full Name\nSchool Number\nClass Number\nClass Teacher\nClass Specialisation");
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e + "Creating fille error. Code: 1");
                 }
@@ -122,351 +138,914 @@ namespace SchoolDataBaseConsole
                 }
             }
         }
-        public void EnterData(int tableNumber)
+
+        public void SelectData(int tableValue, string word) // затестити 2 і 3
         {
-            switch(tableNumber)
+            int[] tableChoise = new int[2];
+            int i = 0;
+            int wordPositionValue;
+            string[] tempFiles = new string[10]
+            { @"D:\TempFile1.txt", @"D:\TempFile2.txt", @"D:\TempFile3.txt", @"D:\TempFile4.txt", @"D:\TempFile5.txt",
+                @"D:\TempFile6.txt",@"D:\TempFile7.txt",@"D:\TempFile8.txt",@"D:\TempFile9.txt",@"D:\TempFile10.txt"};
+            string[] temporaryArray;
+            int[] wordPosition = new int[50];
+            if (tableValue==1) 
+            {
+                Console.WriteLine("Which table?");
+                int localChoise = int.Parse(Console.ReadLine());
+                SearchData(word, localChoise);
+            } // работає 100%
+
+            else if(tableValue==2) 
+            {
+                Console.WriteLine("Pick first table(Use keys 1,2,3:)");
+                tableChoise[0] = int.Parse(Console.ReadLine());
+                Console.WriteLine("Pick second table(Use keys 1,2,3:)");
+                tableChoise[1] = int.Parse(Console.ReadLine());
+                if (tableChoise[0] > tableChoise[1])
+                {
+                    int swap = tableChoise[0];
+                    tableChoise[0] = tableChoise[1];
+                    tableChoise[1] = swap;
+                }
+
+                switch (tableChoise[0]+tableChoise[1])
+                {
+                    case 3: // 1 2
+                        for (int j = 0; j < wordPosition.Length; j++)
+                            wordPosition[j] = (-1);
+                        srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);  // Search in first table
+                        if (srArray[i] == "Full Name")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "School Number")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "School Number")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Number")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Number")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Teacher")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Teacher")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Specialisation")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Specialisation")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[4], false, System.Text.Encoding.Default))
+                            {
+                                while (i < srArray.Length)
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+
+                        
+                        srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);   // search in second table
+                        for (int j = 0; i < srArray.Length; i++)
+                            if (srArray[j] == "School Level")
+                            {
+                                i = j;
+                                break;
+                            }
+                        if (srArray[i] == "School Level")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[5], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "School Specialisation")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "School Specialisation")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[6], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "School Director")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "School Director")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[7], false, System.Text.Encoding.Default))
+                            {
+                                while (i < srArray.Length)
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+
+                        wordPositionValue = 0;
+
+                        for (i = 0; i < 7; i++)
+                        {
+                            temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                            for (int k = 0; k < temporaryArray.Length; k++)
+                            {
+                                if (temporaryArray[k] == word)
+                                {
+                                    wordPosition[wordPositionValue] = k;
+                                    wordPositionValue++;
+                                }
+                            }
+                        }
+
+                        for (int j = 0; j < wordPositionValue; j++)
+                            if (wordPosition[j] != (-1))
+                            {
+                                for (int k = 0; k < 7; k++)
+                                {
+                                    temporaryArray = File.ReadAllLines(tempFiles[k], System.Text.Encoding.Default);
+                                    Console.WriteLine(temporaryArray[0] + "\n" + temporaryArray[wordPosition[j]]);
+                                }
+                            }
+
+                        for (i = 0; i < 7; i++)
+                            if (File.Exists(tempFiles[i]))
+                                File.Delete(tempFiles[i]);
+                        break;
+                    case 5: // 2 3
+                        for (int j = 0; j < wordPosition.Length; j++)
+                            wordPosition[j] = (-1);
+                        i = 0;
+                        srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);   // search in second table
+                        if (srArray[i] == "School number")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "School Level")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "School Level")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "School Specialisation")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "School Specialisation")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "School Director")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "School Director")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
+                            {
+                                while (i < srArray.Length)
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+
+                        i = 0;
+                        srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default); // third table
+                        if (srArray[i] == "Number of Students in Class")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[4], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Teacher")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Teacher")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[5], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Specialisation")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Specialisation")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[6], false, System.Text.Encoding.Default))
+                            {
+                                while (i < srArray.Length)
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+
+                        wordPositionValue = 0;
+
+                        for (i = 0; i < 7; i++)
+                        {
+                            temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                            for (int k = 0; k < temporaryArray.Length; k++)
+                            {
+                                if (temporaryArray[k] == word)
+                                {
+                                    wordPosition[wordPositionValue] = k;
+                                    wordPositionValue++;
+                                }
+                            }
+                        }
+
+                        for (int j = 0; j < wordPositionValue; j++)
+                            if (wordPosition[j] != (-1))
+                            {
+                                for (int k = 0; k < 7; k++)
+                                {
+                                    temporaryArray = File.ReadAllLines(tempFiles[k], System.Text.Encoding.Default);
+                                    Console.WriteLine(temporaryArray[0] + "\n" + temporaryArray[wordPosition[j]]);
+                                }
+                            }
+
+                        for (i = 0; i < 7; i++)
+                            if (File.Exists(tempFiles[i]))
+                                File.Delete(tempFiles[i]);
+                        break;
+                    case 4: // 1 3
+                        for (int j = 0; j < wordPosition.Length; j++)
+                            wordPosition[j] = (-1);
+                        i = 0;
+                        srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);  // Search in first table
+                        if (srArray[i] == "Full Name")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "School Number")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "School Number")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Number")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Number")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Teacher")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Teacher")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Specialisation")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+                        if (srArray[i] == "Class Specialisation")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[4], false, System.Text.Encoding.Default))
+                            {
+                                while (i < srArray.Length)
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+
+                        i = 0;
+                        srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default); // third table
+                        if (srArray[i] == "Number of Students in Class")
+                        {
+                            using (dataWriter = new StreamWriter(tempFiles[5], false, System.Text.Encoding.Default))
+                            {
+                                while (srArray[i] != "Class Teacher")
+                                {
+                                    dataWriter.WriteLine(srArray[i]);
+                                    i++;
+                                }
+                            }
+                        }
+
+                        wordPositionValue = 0;
+
+                        for (i = 0; i < 6; i++)
+                        {
+                            temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                            for (int k = 0; k < temporaryArray.Length; k++)
+                            {
+                                if (temporaryArray[k] == word)
+                                {
+                                    wordPosition[wordPositionValue] = k;
+                                    wordPositionValue++;
+                                }
+                            }
+                        }
+
+                        for (int j = 0; j < wordPositionValue; j++)
+                            if (wordPosition[j] != (-1))
+                            {
+                                for (int k = 0; k < 6; k++)
+                                {
+                                    temporaryArray = File.ReadAllLines(tempFiles[k], System.Text.Encoding.Default);
+                                    Console.WriteLine(temporaryArray[0] + "\n" + temporaryArray[wordPosition[j]]);
+                                }
+                            }
+
+                        for (i = 0; i < 6; i++)
+                            if (File.Exists(tempFiles[i]))
+                                File.Delete(tempFiles[i]);
+                        break;
+                }
+            } // Затестити
+
+            else if(tableValue==3)
+            {
+                for(int j = 0; j < wordPosition.Length; j++)
+                            wordPosition[j] = (-1);
+                srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);  // Search in first table
+                if (srArray[i] == "Full Name")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
+                    {
+                        while (srArray[i] != "School Number")
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+                if (srArray[i] == "School Number")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
+                    {
+                        while (srArray[i] != "Class Number")
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+                if (srArray[i] == "Class Number")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
+                    {
+                        while (srArray[i] != "Class Teacher")
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+                if (srArray[i] == "Class Teacher")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
+                    {
+                        while (srArray[i] != "Class Specialisation")
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+                if (srArray[i] == "Class Specialisation")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[4], false, System.Text.Encoding.Default))
+                    {
+                        while (i < srArray.Length)
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+
+
+                srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);   // search in second table
+                for (int j = 0; i < srArray.Length; i++)
+                    if (srArray[j] == "School Level")
+                    {
+                        i = j;
+                        break;
+                    }
+                if (srArray[i] == "School Level")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[5], false, System.Text.Encoding.Default))
+                    {
+                        while (srArray[i] != "School Specialisation")
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+                if (srArray[i] == "School Specialisation")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[6], false, System.Text.Encoding.Default))
+                    {
+                        while (srArray[i] != "School Director")
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+                if (srArray[i] == "School Director")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[7], false, System.Text.Encoding.Default))
+                    {
+                        while (i < srArray.Length)
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+
+                i = 0;
+                srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default); // third table
+                if (srArray[i] == "Number of Students in Class")
+                {
+                    using (dataWriter = new StreamWriter(tempFiles[8], false, System.Text.Encoding.Default))
+                    {
+                        while (srArray[i] != "Class Teacher")
+                        {
+                            dataWriter.WriteLine(srArray[i]);
+                            i++;
+                        }
+                    }
+                }
+
+                wordPositionValue = 0;
+
+                for (i = 0; i < 9; i++)
+                {
+                    temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                    for (int k = 0; k < temporaryArray.Length; k++)
+                    {
+                        if (temporaryArray[k] == word)
+                        {
+                            wordPosition[wordPositionValue] = k;
+                            wordPositionValue++;
+                        }
+                    }
+                }
+
+                for (int j = 0; j < wordPositionValue; j++)
+                    if (wordPosition[j] != (-1))
+                    {
+                        for (int k = 0; k < 9; k++)
+                        {
+                            temporaryArray = File.ReadAllLines(tempFiles[k], System.Text.Encoding.Default);
+                            Console.WriteLine(temporaryArray[0] + "\n" + temporaryArray[wordPosition[j]]);
+                        }
+                    }
+
+                for (i = 0; i < 9; i++)
+                    if (File.Exists(tempFiles[i]))
+                        File.Delete(tempFiles[i]);
+            } // затестити
+        }
+
+        public void EnterData(int tableNumber) // работає
+        {
+            switch (tableNumber)
             {
                 case 1:
                     Console.WriteLine("You picked first table, enter a data:");
                     srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);
                     for (int i = 0; i < srArray.Length; i++)
                     {
-                        if (srArray[i].Contains("Full name"))
+                        if (srArray[i] == "Full Name")
                         {
                             Console.WriteLine("Enter Full name:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("School Number"))
+                        if (srArray[i] == "School Number")
                         {
                             Console.WriteLine("Enter School Number");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("Class Number")) 
+                        if (srArray[i] == "Class Number")
                         {
                             Console.WriteLine("Enter Class number:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("Class Teacher"))
+                        if (srArray[i] == "Class Teacher")
                         {
                             Console.WriteLine("Enter Class Teacher:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("Class Specialisation"))
+                        if (srArray[i] == "Class Specialisation")
                         {
                             Console.WriteLine("Enter Class Specialisation");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
                     }
+                    File.WriteAllLines(QuestionnairePath, srArray, System.Text.Encoding.Default);
                     break;
                 case 2:
                     Console.WriteLine("You picked second table, enter a data:");
                     srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
                     for (int i = 0; i < srArray.Length; i++)
                     {
-                        if (srArray[i].Contains("School number"))
+                        if (srArray[i] == "School number")
                         {
                             Console.WriteLine("Enter School number:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("School Level"))
+                        if (srArray[i] == "School Level")
                         {
                             Console.WriteLine("Enter School Level:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("School Specialisation"))
+                        if (srArray[i] == "School Specialisation")
                         {
                             Console.WriteLine("Enter School Specialisation:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("School Director"))
+                        if (srArray[i] == "School Director")
                         {
                             Console.WriteLine("Enter School Director:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
                     }
+                    File.WriteAllLines(schoolsPath, srArray, System.Text.Encoding.Default);
                     break;
                 case 3:
                     Console.WriteLine("You picked third table, enter a data:");
                     srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
                     for (int i = 0; i < srArray.Length; i++)
                     {
-                        if (srArray[i].Contains("Number of Students in Class"))
+                        if (srArray[i] == "Number of Students in Class")
                         {
                             Console.WriteLine("Enter Number of Students in Class:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("Class Teacher"))
+                        if (srArray[i] == "Class Teacher")
                         {
                             Console.WriteLine("Enter Class Teacher:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
-                        else if (srArray[i].Contains("Class specialisation"))
+                        if (srArray[i] == "Class Specialisation")
                         {
                             Console.WriteLine("Enter School Director:");
-                            srArray[i] = "\n" + Console.ReadLine();
+                            srArray[i] += "\n" + Console.ReadLine();
                         }
                     }
+                    File.WriteAllLines(classesPath, srArray, System.Text.Encoding.Default);
                     break;
             }
         }
 
-        public void SearchData(string word) // затестити
+        public void SearchData(string word, int tableValue) // Перетестити
         {
             int i = 0;
+            int wordPositionValue;
             string[] tempFiles = new string[5] { @"D:\TempFile1.txt", @"D:\TempFile2.txt", @"D:\TempFile3.txt", @"D:\TempFile4.txt", @"D:\TempFile5.txt" };
-
-            srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);  // Search in first table
-            if (srArray[i].Contains("Full name"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "School Number")
-                    {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
-                    }
-                }
-            }
-            else if (srArray[i].Contains("School Number"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "Class Number")
-                    {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
-                    }
-                }
-            }
-            else if (srArray[i].Contains("Class Number"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "Class Teacher")
-                    {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
-                    }
-                }
-            }
-            else if (srArray[i].Contains("Class Teacher"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "Class Specialisation")
-                    {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
-                    }
-                }
-            }
-            else if (srArray[i].Contains("Class Specialisation"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[4], false, System.Text.Encoding.Default))
-                {
-                    while (i < srArray.Length)
-                    {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
-                    }
-                }
-            }
-
             string[] temporaryArray;
-            int wordPosition = -1;
+            int[] wordPosition = new int[50];
 
-            for (i = 0; i < tempFiles.Length; i++)
+            switch (tableValue)
             {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                for (int k = 0; k < temporaryArray.Length; k++)
-                {
-                    if (temporaryArray[k].Contains(word))
+                case 1:
+                    for (int j = 0; j < wordPosition.Length; j++)
+                        wordPosition[j] = (-1);
+                    srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);  // Search in first table
+                    if (srArray[i] == "Full Name")
                     {
-                        wordPosition = k;
-                        break;
+                        using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "School Number")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-                if (wordPosition != -1)
+                    if (srArray[i] == "School Number")
+                    {
+                        using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "Class Number")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
+                    }
+                    if (srArray[i] == "Class Number")
+                    {
+                        using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "Class Teacher")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
+                    }
+                    if (srArray[i] == "Class Teacher")
+                    {
+                        using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "Class Specialisation")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
+                    }
+                    if (srArray[i] == "Class Specialisation")
+                    {
+                        using (dataWriter = new StreamWriter(tempFiles[4], false, System.Text.Encoding.Default))
+                        {
+                            while (i < srArray.Length)
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
+                    }
+
+                    wordPositionValue = 0;
+
+                    for (i = 0; i < tempFiles.Length; i++)
+                    {
+                        temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                        for (int k = 0; k < temporaryArray.Length; k++)
+                        {
+                            if (temporaryArray[k] == word)
+                            {
+                                wordPosition[wordPositionValue] = k;
+                                wordPositionValue++;
+                            }
+                        }
+                    }
+
+                    for (int j = 0; j < wordPositionValue; j++)
+                        if (wordPosition[j] != (-1))
+                        {
+                            for (int k = 0; k < 3; k++)
+                            {
+                                temporaryArray = File.ReadAllLines(tempFiles[k], System.Text.Encoding.Default);
+                                Console.WriteLine(temporaryArray[0] + "\n" + temporaryArray[wordPosition[j]]);
+                            }
+                        }
+
+                    for (i = 0; i < tempFiles.Length; i++)
+                        if (File.Exists(tempFiles[i]))
+                            File.Delete(tempFiles[i]);
                     break;
-            }
-
-            string output = "";
-
-            for (i = 0; i < tempFiles.Length; i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                output += temporaryArray[0] + "\t";
-            }
-
-            output += "\n";
-            for(i=0;i<tempFiles.Length;i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                output += temporaryArray[wordPosition] + "\t";
-            }
-
-            Console.WriteLine();
-
-            srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);   // search in second table
-            if (srArray[i].Contains("School number"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "School Level")
+                case 2:
+                    for (int j = 0; j < wordPosition.Length; j++)
+                        wordPosition[j] = (-1);
+                    i = 0;
+                    srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);   // search in second table
+                    if (srArray[i] == "School number")
                     {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
+                        using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "School Level")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-            }
-            else if (srArray[i].Contains("School Level"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "School Specialisation")
+                    if (srArray[i] == "School Level")
                     {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
+                        using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "School Specialisation")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-            }
-            else if (srArray[i].Contains("School Specialisation"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "School Director")
+                    if (srArray[i] == "School Specialisation")
                     {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
+                        using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "School Director")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-            }
-            else if (srArray[i].Contains("School Director"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
-                {
-                    while (i < srArray.Length)
+                    if (srArray[i] == "School Director")
                     {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
+                        using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
+                        {
+                            while (i < srArray.Length)
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-            }
 
-            wordPosition = -1;
+                    wordPositionValue = 0;
 
-            for (i = 0; i < 4; i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                for (int k = 0; k < temporaryArray.Length; k++)
-                {
-                    if (temporaryArray[k].Contains(word))
+                    for (i = 0; i < 4; i++)
                     {
-                        wordPosition = k;
-                        break;
+                        temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                        for (int k = 0; k < temporaryArray.Length; k++)
+                        {
+                            if (temporaryArray[k] == word)
+                            {
+                                wordPosition[wordPositionValue] = k;
+                                wordPositionValue++;
+                            }
+                        }
                     }
-                }
-                if (wordPosition != -1)
+
+                    for (int j = 0; j < wordPositionValue; j++)
+                        if (wordPosition[j] != (-1))
+                        {
+                            for (int k = 0; k < 3; k++)
+                            {
+                                temporaryArray = File.ReadAllLines(tempFiles[k], System.Text.Encoding.Default);
+                                Console.WriteLine(temporaryArray[0] + "\n" + temporaryArray[wordPosition[j]]);
+                            }
+                        }
+
+                    for (i = 0; i < 4; i++)
+                        if (File.Exists(tempFiles[i]))
+                            File.Delete(tempFiles[i]);
                     break;
-            }
-
-            output = "";
-
-            for (i = 0; i < tempFiles.Length; i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                output += temporaryArray[0] + "\t";
-            }
-
-            output += "\n";
-            for (i = 0; i < tempFiles.Length; i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                output += temporaryArray[wordPosition] + "\t";
-            }
-
-            Console.WriteLine();
-
-            srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
-            if (srArray[i].Contains("Number of Students in Class"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "Class Teacher")
+                case 3:
+                    for (int j = 0; j < wordPosition.Length; j++)
+                        wordPosition[j] = (-1);
+                    i = 0;
+                    srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default); // third table
+                    if (srArray[i] == "Number of Students in Class")
                     {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
+                        using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "Class Teacher")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-            }
-            else if (srArray[i].Contains("Class Teacher"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
-                {
-                    while (srArray[i] != "Class Specialisation")
+                    if (srArray[i] == "Class Teacher")
                     {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
+                        using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
+                        {
+                            while (srArray[i] != "Class Specialisation")
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-            }
-            else if (srArray[i].Contains("Class Specialisation"))
-            {
-                using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
-                {
-                    while (i < srArray.Length)
+                    if (srArray[i] == "Class Specialisation")
                     {
-                        dataWriter.WriteLine(srArray[i]);
-                        i++;
+                        using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
+                        {
+                            while (i < srArray.Length)
+                            {
+                                dataWriter.WriteLine(srArray[i]);
+                                i++;
+                            }
+                        }
                     }
-                }
-            }
 
-            wordPosition = -1;
+                    wordPositionValue = 0;
 
-            for (i = 0; i < 3; i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                for (int k = 0; k < temporaryArray.Length; k++)
-                {
-                    if (temporaryArray[k].Contains(word))
+                    for (i = 0; i < 3; i++)
                     {
-                        wordPosition = k;
-                        break;
+                        temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                        for (int k = 0; k < temporaryArray.Length; k++)
+                        {
+                            if (temporaryArray[k] == word)
+                            {
+                                wordPosition[wordPositionValue] = k;
+                                wordPositionValue++;
+                            }
+                        }
                     }
-                }
-                if (wordPosition != -1)
+
+                    for (int j = 0; j < wordPositionValue; j++)
+                        if (wordPosition[j] != (-1))
+                        {
+                            for (int k = 0; k < 3; k++)
+                            {
+                                temporaryArray = File.ReadAllLines(tempFiles[k], System.Text.Encoding.Default);
+                                Console.WriteLine(temporaryArray[0] + "\n" + temporaryArray[wordPosition[j]]);
+                            }
+                        }
+
+                    for (i = 0; i < 3; i++)
+                        if(File.Exists(tempFiles[i]))
+                            File.Delete(tempFiles[i]);
                     break;
-            }
-
-            output = "";
-
-            for (i = 0; i < tempFiles.Length; i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                output += temporaryArray[0] + "\t";
-            }
-
-            output += "\n";
-            for (i = 0; i < tempFiles.Length; i++)
-            {
-                temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                output += temporaryArray[wordPosition] + "\t";
+                default:
+                    Console.WriteLine("Wrong table number");
+                    break;
             }
         }
 
-        public void SelectData(int tableValue) // затестити
+        public void OutputData(int tableValue) // работає
         {
             int[] tablesChoise = new int[2];
             string[] arrayOutput;
-            int i = 0;
-            if (tableValue == 2)
+            int i;
+            if(tableValue==1)
             {
-                Console.WriteLine("Pick first table(Use keys 1,2,3:");
+                Console.WriteLine("Pick table for output(use keys 1,2,3:)");
+                switch(int.Parse(Console.ReadLine()))
+                {
+                    case 1:
+                        ShowTable(1);
+                        break;
+                    case 2:
+                        ShowTable(2);
+                        break;
+                    case 3:
+                        ShowTable(3);
+                        break;
+                    default:
+                        Console.WriteLine("Wrong number");
+                        break;
+                }
+            }
+            else if (tableValue == 2)
+            {
+                Console.WriteLine("Pick first table(Use keys 1,2,3:)");
                 tablesChoise[0] = int.Parse(Console.ReadLine());
-                Console.WriteLine("Pick second table(Use keys 1,2,3:");
-                tablesChoise[1] = int.Parse(Console.ReadLine()); 
-                if(tablesChoise[0]>tablesChoise[1])
+                Console.WriteLine("Pick second table(Use keys 1,2,3:)");
+                tablesChoise[1] = int.Parse(Console.ReadLine());
+                if (tablesChoise[0] > tablesChoise[1])
                 {
                     int swap = tablesChoise[0];
                     tablesChoise[0] = tablesChoise[1];
@@ -478,216 +1057,96 @@ namespace SchoolDataBaseConsole
                 switch (tableChoiseValue)
                 {
                     case 3: // 1 2
-                        arrayOutput = new string[8];
-
-                        srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);
-                        if (srArray[i].Contains("Full name"))
+                        ShowTable(1);
+                        srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
+                        arrayOutput = new string[4];
+                        for (i = 0; i < srArray.Length; i++)
+                            if (srArray[i] == "School Level")
+                                break;
+                        
+                        if (srArray[i] == "School Level")
                         {
-                            while (srArray[i] != "School Number")
+                            while (srArray[i] != "School Specialisation")
                             {
                                 arrayOutput[0] += srArray[i] + "\n";
                                 i++;
                             }
                         }
-                        else if (srArray[i].Contains("School Number"))
+                        if (srArray[i] == "School Specialisation")
                         {
-                            while (srArray[i] != "Class Number")
+                            while (srArray[i] != "School Director")
                             {
                                 arrayOutput[1] += srArray[i] + "\n";
                                 i++;
                             }
                         }
-                        else if (srArray[i].Contains("Class Number"))
+                        if (srArray[i] == "School Director")
                         {
-                            while (srArray[i] != "Class Teacher")
+                            while (i < srArray.Length)
                             {
                                 arrayOutput[2] += srArray[i] + "\n";
                                 i++;
                             }
                         }
-                        else if (srArray[i].Contains("Class Teacher"))
-                        {
-                            while (srArray[i] != "Class Specialisation")
-                            {
-                                arrayOutput[3] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("Class Specialisation"))
-                        {
-                            while (i < srArray.Length)
-                            {
-                                arrayOutput[4] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-
-                        i = 0;
-
-                        srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
-                        if (srArray[i].Contains("School Level"))
-                        {
-                            while (srArray[i] != "School Specialisation")
-                            {
-                                arrayOutput[5] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("School Specialisation"))
-                        {
-                            while (srArray[i] != "School Director")
-                            {
-                                arrayOutput[6] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("School Director"))
-                        {
-                            while (i < srArray.Length)
-                            {
-                                arrayOutput[7] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-
                         for (i = 0; i < arrayOutput.Length; i++)
                         {
-                            Console.WriteLine(arrayOutput[i] + "\t");
+                            Console.WriteLine(arrayOutput[i]);
                         }
                         break;
                     case 5: //2 3 
-                        srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
-                        arrayOutput = new string[7];
-                        if (srArray[i].Contains("School Number"))
+                        ShowTable(2);
+                        i = 0;
+                        arrayOutput = new string[3];
+
+                        srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
+                        if (srArray[i]=="Number of Students in Class")
                         {
-                            while (srArray[i] != "School Level")
+                            while (srArray[i] != "Class Teacher")
                             {
                                 arrayOutput[0] += srArray[i] + "\n";
                                 i++;
                             }
                         }
-                        else if (srArray[i].Contains("School Level"))
-                        {
-                            while (srArray[i] != "School Specialisation")
-                            {
-                                arrayOutput[1] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("School Specialisation"))
-                        {
-                            while (srArray[i] != "School Director")
-                            {
-                                arrayOutput[2] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("School Director"))
-                        {
-                            while (i < srArray.Length)
-                            {
-                                arrayOutput[3] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-
-                        i = 0;
-
-                        srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
-                        if (srArray[i].Contains("Number of Students in Class"))
-                        {
-                            while (srArray[i] != "Class Teacher")
-                            {
-                                arrayOutput[4] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("Class Teacher"))
+                        if (srArray[i] == "Class Teacher")
                         {
                             while (srArray[i] != "Class specialisation")
                             {
-                                arrayOutput[5] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("Class specialisation"))
-                        {
-                            while (i < srArray.Length)
-                            {
-                                arrayOutput[6] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-
-                        for (i = 0; i < arrayOutput.Length; i++)
-                        {
-                            Console.WriteLine(arrayOutput[i] + "\t");
-                        }
-                        break;
-                    case 4: //1 3
-                        srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);
-                        arrayOutput = new string[6];
-                        if (srArray[i].Contains("Full name"))
-                        {
-                            while (srArray[i] != "School Number")
-                            {
-                                arrayOutput[0] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("School Number"))
-                        {
-                            while (srArray[i] != "Class Number")
-                            {
                                 arrayOutput[1] += srArray[i] + "\n";
                                 i++;
                             }
                         }
-                        else if (srArray[i].Contains("Class Number"))
+                        if (srArray[i] == "Class Specialisation")
                         {
-                            while (srArray[i] != "Class Teacher")
+                            while (i < srArray.Length)
                             {
                                 arrayOutput[2] += srArray[i] + "\n";
                                 i++;
                             }
                         }
-                        else if (srArray[i].Contains("Class Teacher"))
-                        {
-                            while (srArray[i] != "Class Specialisation")
-                            {
-                                arrayOutput[3] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
-                        else if (srArray[i].Contains("Class Specialisation"))
-                        {
-                            while (i < srArray.Length)
-                            {
-                                arrayOutput[4] += srArray[i] + "\n";
-                                i++;
-                            }
-                        }
+
                         for (i = 0; i < arrayOutput.Length; i++)
                         {
-                            Console.WriteLine(arrayOutput[i] + "\t");
+                            Console.WriteLine(arrayOutput[i]);
                         }
-
+                        break;
+                    case 4: //1 3
+                        ShowTable(1);
                         i = 0;
+                        arrayOutput = new string[1];
 
                         srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
-                        arrayOutput = new string[3];
-                        if (srArray[i].Contains("Number of Students in Class"))
+                        if (srArray[i] == "Number of Students in Class")
                         {
                             while (srArray[i] != "Class Teacher")
                             {
-                                arrayOutput[5] += srArray[i] + "\n";
+                                arrayOutput[0] += srArray[i] + "\n";
                                 i++;
                             }
                         }
 
                         for (i = 0; i < arrayOutput.Length; i++)
                         {
-                            Console.WriteLine(arrayOutput[i] + "\t");
+                            Console.WriteLine(arrayOutput[i]);
                         }
                         break;
                 }
@@ -696,80 +1155,34 @@ namespace SchoolDataBaseConsole
             {
                 srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);
                 arrayOutput = new string[10];
-                i = 0;
-                if (srArray[i].Contains("Full name"))
+                ShowTable(1);
+
+                srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
+                for (i = 0; i < srArray.Length; i++)
+                    if (srArray[i] == "School Level")
+                        break;
+
+                if (srArray[i] == "School Level")
                 {
-                    while (srArray[i] != "School Number")
+                    while (srArray[i] != "School Specialisation")
                     {
                         arrayOutput[0] += srArray[i] + "\n";
                         i++;
                     }
                 }
-                else if (srArray[i].Contains("School Number"))
+                if (srArray[i] == "School Specialisation")
                 {
-                    while (srArray[i] != "Class Number")
+                    while (srArray[i] != "School Director")
                     {
                         arrayOutput[1] += srArray[i] + "\n";
                         i++;
                     }
                 }
-                else if (srArray[i].Contains("Class Number"))
+                if (srArray[i] == "School Director")
                 {
-                    while (srArray[i] != "Class Teacher")
+                    while (i < srArray.Length)
                     {
                         arrayOutput[2] += srArray[i] + "\n";
-                        i++;
-                    }
-                }
-                else if (srArray[i].Contains("Class Teacher"))
-                {
-                    while (srArray[i] != "Class Specialisation")
-                    {
-                        arrayOutput[3] += srArray[i] + "\n";
-                        i++;
-                    }
-                }
-                else if (srArray[i].Contains("Class Specialisation"))
-                {
-                    while (i < srArray.Length)
-                    {
-                        arrayOutput[4] += srArray[i] + "\n";
-                        i++;
-                    }
-                }
-
-                i = 0;
-
-                srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
-                if (srArray[i].Contains("School Number"))
-                {
-                    while (srArray[i] != "School Level")
-                    {
-                        arrayOutput[5] += srArray[i] + "\n";
-                        i++;
-                    }
-                }
-                else if (srArray[i].Contains("School Level"))
-                {
-                    while (srArray[i] != "School Specialisation")
-                    {
-                        arrayOutput[6] += srArray[i] + "\n";
-                        i++;
-                    }
-                }
-                else if (srArray[i].Contains("School Specialisation"))
-                {
-                    while (srArray[i] != "School Director")
-                    {
-                        arrayOutput[7] += srArray[i] + "\n";
-                        i++;
-                    }
-                }
-                else if (srArray[i].Contains("School Director"))
-                {
-                    while (i < srArray.Length)
-                    {
-                        arrayOutput[8] += srArray[i] + "\n";
                         i++;
                     }
                 }
@@ -777,12 +1190,11 @@ namespace SchoolDataBaseConsole
                 i = 0;
 
                 srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
-                arrayOutput = new string[3];
-                if (srArray[i].Contains("Number of Students in Class"))
+                if (srArray[i] == "Number of Students in Class")
                 {
                     while (srArray[i] != "Class Teacher")
                     {
-                        arrayOutput[9] += srArray[i] + "\n";
+                        arrayOutput[0] += srArray[i] + "\n";
                         i++;
                     }
                 }
@@ -793,8 +1205,8 @@ namespace SchoolDataBaseConsole
                 }
             }
         }
-
-        public void DeleteData(string word, int tableNumber) // затестити
+    
+        public void DeleteData(string word, int tableNumber) // Залишає після себе пропуски, але працює
         {
             int i = 0;
             string[] tempFiles = new string[5] { @"D:\TempFile1.txt", @"D:\TempFile2.txt", @"D:\TempFile3.txt", @"D:\TempFile4.txt", @"D:\TempFile5.txt" };
@@ -803,7 +1215,7 @@ namespace SchoolDataBaseConsole
             {
                 case 1:
                     srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);
-                    if (srArray[i].Contains("Full name"))
+                    if (srArray[i]=="Full Name")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
                         {
@@ -814,7 +1226,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("School Number"))
+                    if (srArray[i]=="School Number")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
                         {
@@ -825,7 +1237,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("Class Number"))
+                    if (srArray[i]=="Class Number")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
                         {
@@ -836,7 +1248,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("Class Teacher"))
+                    if (srArray[i]=="Class Teacher")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
                         {
@@ -847,7 +1259,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("Class Specialisation"))
+                    if (srArray[i]=="Class Specialisation")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[4], false, System.Text.Encoding.Default))
                         {
@@ -879,9 +1291,12 @@ namespace SchoolDataBaseConsole
 
                     for(i=0;i<tempFiles.Length;i++)
                     {
-                        temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                        temporaryArray[wordPosition] = " ";
-                        File.WriteAllLines(tempFiles[i], temporaryArray, System.Text.Encoding.Default);
+                        if (wordPosition != (-1))
+                        {
+                            temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
+                            temporaryArray[wordPosition] = "";
+                            File.WriteAllLines(tempFiles[i], temporaryArray, System.Text.Encoding.Default);
+                        }
                     }
 
                     int j = 0;
@@ -910,13 +1325,14 @@ namespace SchoolDataBaseConsole
 
                     for (j = 0; j < tempFiles.Length; j++)
                     {
-                        if (File.Exists(tempFiles[i]))
+                        if (File.Exists(tempFiles[j]))
                             File.Delete(tempFiles[j]);
                     }
+                    
                     break;
                 case 2:
                     srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
-                    if (srArray[i].Contains("School number"))
+                    if (srArray[i]=="School number")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
                         {
@@ -927,7 +1343,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("School Level"))
+                    if (srArray[i]=="School Level")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
                         {
@@ -938,7 +1354,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("School Specialisation"))
+                    if (srArray[i]=="School Specialisation")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
                         {
@@ -949,7 +1365,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("School Director"))
+                    if (srArray[i]=="School Director")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[3], false, System.Text.Encoding.Default))
                         {
@@ -981,7 +1397,7 @@ namespace SchoolDataBaseConsole
                     for (i = 0; i < 4; i++)
                     {
                         temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                        temporaryArray[wordPosition] = " ";
+                        temporaryArray[wordPosition] = "";
                         File.WriteAllLines(tempFiles[i], temporaryArray, System.Text.Encoding.Default);
                     }
 
@@ -1003,17 +1419,18 @@ namespace SchoolDataBaseConsole
                     for (i = 0; i < 4 && j < srArray.Length; i++, j++)
                         srArray[j] = temporaryArray[i];
 
-                    File.WriteAllLines(QuestionnairePath, srArray, System.Text.Encoding.Default);
+                    File.WriteAllLines(schoolsPath, srArray, System.Text.Encoding.Default);
 
                     for (j = 0; j < 4; j++)
                     {
-                        if(File.Exists(tempFiles[i]))
+                        if(File.Exists(tempFiles[j]))
                             File.Delete(tempFiles[j]);
                     }
+
                     break;
                 case 3:
                     srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
-                    if (srArray[i].Contains("Number of Students in Class"))
+                    if (srArray[i]=="Number of Students in Class")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[0], false, System.Text.Encoding.Default))
                         {
@@ -1024,7 +1441,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("Class Teacher"))
+                    if (srArray[i]=="Class Teacher")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[1], false, System.Text.Encoding.Default))
                         {
@@ -1035,7 +1452,7 @@ namespace SchoolDataBaseConsole
                             }
                         }
                     }
-                    else if (srArray[i].Contains("Class Specialisation"))
+                    if (srArray[i]=="Class Specialisation")
                     {
                         using (dataWriter = new StreamWriter(tempFiles[2], false, System.Text.Encoding.Default))
                         {
@@ -1067,7 +1484,7 @@ namespace SchoolDataBaseConsole
                     for (i = 0; i < 3; i++)
                     {
                         temporaryArray = File.ReadAllLines(tempFiles[i], System.Text.Encoding.Default);
-                        temporaryArray[wordPosition] = " ";
+                        temporaryArray[wordPosition] = "";
                         File.WriteAllLines(tempFiles[i], temporaryArray, System.Text.Encoding.Default);
                     }
 
@@ -1088,14 +1505,14 @@ namespace SchoolDataBaseConsole
 
                     for (j = 0; j < 4; j++)
                     {
-                        if (File.Exists(tempFiles[i]))
+                        if (File.Exists(tempFiles[j]))
                             File.Delete(tempFiles[j]);
                     }
                     break;
             }
         }
 
-        public void ShowData(int tableNumber) 
+        private void ShowTable(int tableNumber) // Працює!! 
         {
             string[] arrayOutput;
             int i = 0;
@@ -1103,8 +1520,8 @@ namespace SchoolDataBaseConsole
             {
                 case 1:
                     srArray = File.ReadAllLines(QuestionnairePath, System.Text.Encoding.Default);
-                    arrayOutput = new string[5];
-                    if (srArray[i].Contains("Full name"))
+                    arrayOutput = new string[5] { "","","","","",};
+                    if (srArray[i]=="Full Name")
                     {
                         while (srArray[i] != "School Number")
                         {
@@ -1112,7 +1529,7 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("School Number"))
+                    if (srArray[i] == "School Number")
                     {
                         while (srArray[i] != "Class Number")
                         {
@@ -1120,7 +1537,7 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("Class Number"))
+                    if (srArray[i] == "Class Number")
                     {
                         while (srArray[i] != "Class Teacher")
                         {
@@ -1128,7 +1545,7 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("Class Teacher"))
+                    if (srArray[i] == "Class Teacher")
                     {
                         while (srArray[i] != "Class Specialisation")
                         {
@@ -1136,7 +1553,7 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("Class Specialisation"))
+                    if (srArray[i] == "Class Specialisation")
                     {
                         while (i < srArray.Length)
                         {
@@ -1146,13 +1563,13 @@ namespace SchoolDataBaseConsole
                     }
                     for (i=0;i<arrayOutput.Length;i++)
                     {
-                        Console.WriteLine(arrayOutput[i] + "\t");
+                        Console.WriteLine(arrayOutput[i]);
                     }
                     break;
                 case 2:
                     srArray = File.ReadAllLines(schoolsPath, System.Text.Encoding.Default);
                     arrayOutput = new string[4];
-                    if (srArray[i].Contains("School Number"))
+                    if (srArray[i]=="School number")
                     {
                         while (srArray[i] != "School Level")
                         {
@@ -1160,7 +1577,7 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("School Level"))
+                    if (srArray[i]=="School Level")
                     {
                         while (srArray[i] != "School Specialisation")
                         {
@@ -1168,7 +1585,7 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("School Specialisation"))
+                    if (srArray[i]=="School Specialisation")
                     {
                         while (srArray[i] != "School Director")
                         {
@@ -1176,7 +1593,7 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("School Director"))
+                    if(srArray[i]=="School Director")
                     {
                         while (i<srArray.Length)
                         {
@@ -1186,13 +1603,13 @@ namespace SchoolDataBaseConsole
                     }
                     for (i = 0; i < arrayOutput.Length; i++)
                     {
-                        Console.WriteLine(arrayOutput[i] + "\t");
+                        Console.WriteLine(arrayOutput[i]);
                     }
                     break;
                 case 3:
                     srArray = File.ReadAllLines(classesPath, System.Text.Encoding.Default);
                     arrayOutput = new string[3];
-                    if (srArray[i].Contains("Number of Students in Class"))
+                    if (srArray[i]=="Number of Students in Class")
                     {
                         while (srArray[i] != "Class Teacher")
                         {
@@ -1200,15 +1617,15 @@ namespace SchoolDataBaseConsole
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("Class Teacher"))
+                    if (srArray[i]=="Class Teacher")
                     {
-                        while (srArray[i] != "Class specialisation")
+                        while (srArray[i] != "Class Specialisation")
                         {
                             arrayOutput[1] += srArray[i] + "\n";
                             i++;
                         }
                     }
-                    else if (srArray[i].Contains("Class specialisation"))
+                    if (srArray[i]=="Class Specialisation")
                     {
                         while (i<srArray.Length)
                         {
@@ -1218,7 +1635,7 @@ namespace SchoolDataBaseConsole
                     }
                     for (i = 0; i < arrayOutput.Length; i++)
                     {
-                        Console.WriteLine(arrayOutput[i] + "\t");
+                        Console.WriteLine(arrayOutput[i]);
                     }
                     break;
             }
